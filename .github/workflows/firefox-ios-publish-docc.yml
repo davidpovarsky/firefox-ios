@@ -9,6 +9,7 @@ on:
       - .github/workflows/firefox-ios-publish-docc.yml
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write # Uses GitHub API to get GitHub Pages configuration outputs
@@ -27,12 +28,36 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Switch to Xcode ${{ matrix.xcode }}
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: ${{ matrix.xcode }}
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Checkout
         uses: actions/checkout@v5
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Build DocC
         run: |
           xcodebuild docbuild -project firefox-ios/Client.xcodeproj \
@@ -44,11 +69,27 @@ jobs:
             --hosting-base-path "firefox-ios" \
             --output-path docs;
           echo "<script>window.location.href += \"/documentation/componentlibrary\"</script>" > docs/index.html;
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Store docs artifact
         uses: actions/upload-pages-artifact@v4
         with:
           # Upload only docs directory
           path: 'docs'
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
