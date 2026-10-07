@@ -34,7 +34,6 @@ on:
       - "Update Outdated Bitrise Steps Versions"
       - "Update README with current tech stack"
     types:
-      - requested
       - in_progress
       - completed
 
