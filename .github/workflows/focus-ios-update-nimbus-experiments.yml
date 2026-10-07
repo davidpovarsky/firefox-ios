@@ -14,12 +14,28 @@ jobs:
     name: "Update Nimbus Experiments"
     runs-on: ubuntu-latest
     steps:
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: "Checkout Main Branch"
         uses: actions/checkout@v4
         with:
           path: focus-ios
           ref: main
           fetch-depth: 0
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: "Update Experiments JSON"
         id: update-experiments-json
         uses: mozilla-mobile/update-experiments@v3
@@ -29,6 +45,15 @@ jobs:
           experimenter-url: https://experimenter.services.mozilla.com/api/v6/experiments-first-run/
           app-name: focus_ios
           branch: automation/update-nimbus-experiments
+      - name: Live Activity · refresh
+        if: steps.update-experiments-json.outputs.changed == 1 && steps.update-experiments-json.outputs.changed-branch >= 1
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Create Pull Request
         id: create-pull-request
         uses: peter-evans/create-pull-request@v6
@@ -42,6 +67,15 @@ jobs:
           body: "This (automated) PR updates the initial_experiments.json on the `main` branch"
           delete-branch: true
           labels: Needs Code Review
+      - name: Live Activity · refresh
+        if: steps.create-pull-request.outputs.pull-request-operation == 'created'
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Enable Pull Request Automerge
         if: steps.create-pull-request.outputs.pull-request-operation == 'created'
         run: gh pr merge --squash "${{ steps.create-pull-request.outputs.pull-request-number }}"
