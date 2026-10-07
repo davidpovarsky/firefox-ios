@@ -14,7 +14,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -22,18 +29,42 @@ jobs:
             token: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 2: Set up Python
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
 
       # Step 3: Install dependencies
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
 
       # Step 4: Run the script to update Bitrise steps
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Run update script
         id: update_script
         run: |
@@ -42,6 +73,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 5: Determine PR Version Number
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Determine PR Version Number
         id: versioning
         run: |
@@ -56,6 +95,14 @@ jobs:
           echo "next_version=${next_version}" >> $GITHUB_ENV
           echo "current_date=$current_date" >> $GITHUB_ENV
 
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Script to check if branch exists to not commit again
         run: |-
           branch=$(curl -X GET -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/mozilla-mobile/firefox-ios/branches?per_page=100 | jq -r --arg tag "update-bitrise-steps-${next_version}" '.[].name | select(contains($tag))')
@@ -63,6 +110,15 @@ jobs:
           if [ -z "$branch" ]; then echo "BRANCH_CREATED=false" >> $GITHUB_ENV; else echo "BRANCH_CREATED=true"  >> $GITHUB_ENV;fi
 
       # Step 6: Check for changes
+      - name: Live Activity · refresh
+        if: env.BRANCH_CREATED == 'false'
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Commit changes if any
         if: env.BRANCH_CREATED == 'false'
         run: |
@@ -70,6 +126,15 @@ jobs:
           git diff --quiet || (git add bitrise.yml)
 
       # Step 7: Create a Pull Request
+      - name: Live Activity · refresh
+        if: env.BRANCH_CREATED == 'false'
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Create a Pull Request
         uses: peter-evans/create-pull-request@v6
         if: env.BRANCH_CREATED == 'false'
@@ -91,6 +156,14 @@ jobs:
     needs: update-steps
     if: failure() # Trigger only if the 'update-steps' job fails
     steps:
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Report to Slack
         id: slack
         uses: slackapi/slack-github-action@v2.0.0
