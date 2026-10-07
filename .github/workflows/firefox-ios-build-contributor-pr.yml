@@ -14,23 +14,81 @@ jobs:
         - { scheme: 'Fennec_Enterprise_XCUITests', destination: 'platform=iOS Simulator,OS=latest,name=iPhone 11', testplan: 'Smoketest1' }
     name: Run UI Smoketests
     steps:
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Checkout repository
           uses: actions/checkout@v4
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Select Xcode ${{ matrix.xcode }}
           run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Set up Python ${{ matrix.python-version }}
           uses: actions/setup-python@v5
           with:
             python-version: ${{ matrix.python-version }}
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Run Boostrap
           run: sh ./bootstrap.sh
           env:
             GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Build and Test
           run: xcodebuild clean test -scheme '${{ matrix.run-config['scheme'] }}' -destination '${{ matrix.run-config['destination'] }}' -testPlan '${{ matrix.run-config['testplan'] }}' -resultBundlePath TestResults -derivedDataPath results
+        - name: Live Activity · refresh
+          if: ${{ always() }}
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Archive Results
           if: ${{ always() }}
           run: zip -r results.zip TestResults.xcresult
+        - name: Live Activity · refresh
+          if: ${{ always() }}
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - uses: actions/upload-artifact@v4
           name: Upload XCResult
           if: ${{ always() }}
