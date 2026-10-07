@@ -27,17 +27,49 @@ jobs:
           - ios_version: 15.5
             ios_simulator: iPhone 13
     steps:
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Check out source code
         uses: actions/checkout@v4.1.7
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Install packages
         run: |
           pip3 install virtualenv pipenv
           gem install xcpretty -v 0.3.0
           pip install blockkit==1.9.1
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Setup Xcode
         id: xcode
         run: |
@@ -48,6 +80,14 @@ jobs:
           xcodebuild -version
           ./bootstrap.sh focus
           ./bootstrap.sh firefox --force
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Create iOS ${{ matrix.ios_version }} simulator
         id: setup-simulator
         run: |
@@ -59,6 +99,14 @@ jobs:
             echo "Install iOS ${{ matrix.ios_version }} runtime"
             sudo xcodes runtimes install "iOS ${{ matrix.ios_version }}"
           fi
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Build Focus
         id: compile
         run: |
@@ -70,6 +118,14 @@ jobs:
             -destination 'platform=iOS Simulator,arch=arm64,name=${{ matrix.ios_simulator }},OS=${{ matrix.ios_version }}' \
             COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO ARCH="arm64"
         working-directory:  ${{ env.browser }}
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Run smoke tests
         id: run-smoketests
         run: |
@@ -94,6 +150,14 @@ jobs:
             | tee xcodebuild-smoketests.log | xcpretty _0.3.0_ -r junit --output ./junit-smoketests.xml && exit ${PIPESTATUS[0]}
         working-directory: ${{ env.browser }}
         continue-on-error: true
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Run full functional tests
         id: run-fullfunctionaltests
         run: |
@@ -108,6 +172,14 @@ jobs:
             | tee xcodebuild-fullfunctionaltests.log | xcpretty _0.3.0_ -r junit --output ./junit-fullfunctionaltests.xml && exit ${PIPESTATUS[0]}
         working-directory: ${{ env.browser }}
         continue-on-error: true
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Determine pass/fail status
         id: passfail
         run: |
@@ -120,6 +192,14 @@ jobs:
             exit 0
           fi
         continue-on-error: true
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Print test report
         id: test-report
         run: |
@@ -141,6 +221,14 @@ jobs:
           python ../test-fixtures/ci/convert_junit_to_markdown.py --slack --${{ env.browser }} ./junit-fullfunctionaltests.xml ./slack-fullfunctionaltests.json
           mv ./junit-fullfunctionaltests.xml "junit-focus-ios-fullfunctionaltests-${{ matrix.ios_simulator }}-${{ matrix.ios_version }}-`date +"%Y-%m-%d"`.xml"
         working-directory:  ${{ env.browser }}
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Upload junit files
         id: upload-junit
         uses: actions/upload-artifact@v4.3.3
@@ -148,6 +236,14 @@ jobs:
           name: ${{ env.browser }}-${{ matrix.ios_simulator }}-${{ matrix.ios_version }}-junit-${{ github.run_number }}
           path: ${{ env.browser }}/junit-focus-ios-*.xml
           retention-days: 90
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Upload log file
         id: upload-log
         uses: actions/upload-artifact@v4.3.3
@@ -155,6 +251,14 @@ jobs:
           name: ${{ env.browser }}-${{ matrix.ios_simulator }}-${{ matrix.ios_version }}-xcodebuildlog-${{ github.run_number }}
           path: ${{ env.browser }}/xcodebuild-*.log
           retention-days: 90
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Report to Slack (SmokeTests)
         id: slack-smoketests
         uses: slackapi/slack-github-action@v2.0.0
@@ -173,6 +277,14 @@ jobs:
           run_id: ${{ github.run_id }}
           server_url: ${{ github.server_url }}
           sha: ${{ github.sha }}
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Report to Slack (FullFunctionalTests)
         id: slack-fullfunctionaltests
         uses: slackapi/slack-github-action@v2.0.0
@@ -191,6 +303,14 @@ jobs:
           run_id: ${{ github.run_id }}
           server_url: ${{ github.server_url }}
           sha: ${{ github.sha }}
+      - name: Live Activity · refresh
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Return fail status if a test fails
         run: |
           exit ${{ steps.passfail.outcome == 'success' && '0' || '1' }}   
