@@ -1,6 +1,7 @@
 name: "Focus: import translations"
 
 permissions:
+  actions: read
   contents: write
   pull-requests: write
 
