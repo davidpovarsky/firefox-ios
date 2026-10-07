@@ -23,19 +23,59 @@ jobs:
         xcode: ["15.2"]
     continue-on-error: true
     steps:
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Checkout repository
           uses: actions/checkout@v4
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Get the current github action name
           run: |
             github_action_name="Update credential provider script"
             echo "github_action_name=$github_action_name" >> $GITHUB_ENV
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Clone repository
           run: |
             git clone https://github.com/issammani/test-playwright.git
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Install node
           uses: actions/setup-node@v4
           with:
            node-version: 18
+        - name: Live Activity · refresh
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - run: |
             echo "Install dependencies and run tests"
             npm i
@@ -48,9 +88,27 @@ jobs:
             
             echo "Run tests"
             npm test
+        - name: Live Activity · refresh
+          if: always()
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Set job log URL
           if: always()
           run: echo "JOB_LOG_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
+        - name: Live Activity · refresh
+          if: '${{ !cancelled() && !github.event.pull_request.head.repo.fork }}'
+          uses: davidpovarsky/github-automation/live-refresh@main
+          continue-on-error: true
+          with:
+            event: refresh
+            device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+            token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+            github_token: ${{ github.token }}
         - name: Send Slack notification if tests fail
           if: '${{ !cancelled() && !github.event.pull_request.head.repo.fork }}'
           id: slack
