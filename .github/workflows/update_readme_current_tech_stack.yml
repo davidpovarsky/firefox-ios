@@ -10,19 +10,52 @@ jobs:
         runs-on: macos-latest
 
         steps:
+            - name: Live Activity · refresh
+              uses: davidpovarsky/github-automation/live-refresh@main
+              continue-on-error: true
+              with:
+                event: refresh
+                device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+                token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+                github_token: ${{ github.token }}
             - name: Checkout code
               uses: actions/checkout@v3    
     
+            - name: Live Activity · refresh
+              uses: davidpovarsky/github-automation/live-refresh@main
+              continue-on-error: true
+              with:
+                event: refresh
+                device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+                token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+                github_token: ${{ github.token }}
             - name: Update README
               run: |
                sh update_readme_project_stack.sh
             
+            - name: Live Activity · refresh
+              uses: davidpovarsky/github-automation/live-refresh@main
+              continue-on-error: true
+              with:
+                event: refresh
+                device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+                token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+                github_token: ${{ github.token }}
             - name: Check changes
               run: |
                 if [[ $(git status --porcelain) ]]; then
                     echo "changes_detected=true" >> $GITHUB_ENV 
                 fi
 
+            - name: Live Activity · refresh
+              if: ${{ env.changes_detected }}
+              uses: davidpovarsky/github-automation/live-refresh@main
+              continue-on-error: true
+              with:
+                event: refresh
+                device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+                token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+                github_token: ${{ github.token }}
             - name: Commit if needed 
               if: ${{ env.changes_detected }}
               run: |
@@ -31,6 +64,15 @@ jobs:
                 git add README.md
                 git commit -m "Update README with latest tech stack"
 
+            - name: Live Activity · refresh
+              if: ${{ env.changes_detected }}
+              uses: davidpovarsky/github-automation/live-refresh@main
+              continue-on-error: true
+              with:
+                event: refresh
+                device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+                token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+                github_token: ${{ github.token }}
             - name: Create Pull Request
               if: ${{ env.changes_detected }}
               uses: peter-evans/create-pull-request@v6
