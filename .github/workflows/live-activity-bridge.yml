@@ -1,0 +1,67 @@
+name: Live Activity Bridge
+
+on:
+  workflow_run:
+    workflows:
+      - "Create a PR to update Kingfisher to the newest version available"
+      - "Create a PR to build the app using newest a-s version available"
+      - "Contribution Guardrails"
+      - "Build and Run Autofill Automation"
+      - "Build contributor PR"
+      - "Firefox: import translations"
+      - "Firefox: reference string linter"
+      - "Build and publish ComponentLibrary DocC"
+      - "Close Stale Issues"
+      - "Sync Icons from Acorn repo"
+      - "Firefox UI Tests for iOS 15, 16 & 17"
+      - "Firefox UI Tests"
+      - "Create a PR if there are changes in effective_tld_names file"
+      - "Firefox Update Nimbus Experiments"
+      - "Update URIs and Create PR"
+      - "Bitrise Xcode Check and Update"
+      - "Update credential provider script"
+      - "Fetch Remote Settings"
+      - "Focus: import translations"
+      - "Focus: reference string linter"
+      - "L10n Focus iOS screenshots (one set of locales only)"
+      - "L10n Focus iOS screenshots"
+      - "Focus iOS 15, 16 & 17 tests"
+      - "Focus UI Tests"
+      - "Focus Update Nimbus Experiments"
+      - "Glean probe-scraper"
+      - "Comment App Version on Merged PR"
+      - "(Local AS flow) Create a PR for release with the newest A-S version available"
+      - "Update Outdated Bitrise Steps Versions"
+      - "Update README with current tech stack"
+    types:
+      - requested
+      - in_progress
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: live-activity-bridge-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  bridge:
+    name: Bridge
+    if: ${{ github.event.workflow_run.name != 'Live Activity Bridge' && !startsWith(github.event.workflow_run.name, 'Live Activity Bridge') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Live Activity · lifecycle
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: ${{ github.event.action == 'completed' && 'final' || 'start' }}
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
+          source_repository: ${{ github.event.workflow_run.repository.full_name || github.repository }}
+          source_run_id: ${{ github.event.workflow_run.id }}
+          source_run_attempt: ${{ github.event.workflow_run.run_attempt }}
+          source_branch: ${{ github.event.workflow_run.head_branch }}
