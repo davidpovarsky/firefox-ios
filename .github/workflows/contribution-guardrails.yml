@@ -15,6 +15,7 @@ jobs:
       group: contribution-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     permissions:
+      actions: read
       pull-requests: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -23,6 +24,15 @@ jobs:
       PR_AUTHOR: ${{ github.event.pull_request.user.login }}
 
     steps:
+      - name: Live Activity · refresh
+        if: github.event.action == 'labeled' && github.event.label.name == 'does-not-meet-guidelines'
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Handle does-not-meet-guidelines label
         if: github.event.action == 'labeled' && github.event.label.name == 'does-not-meet-guidelines'
         shell: bash
@@ -60,6 +70,15 @@ jobs:
           retry gh pr comment "$NUMBER" -R "$GH_REPO" -b "$BODY" || true
           retry gh pr close "$NUMBER" -R "$GH_REPO" || true
 
+      - name: Live Activity · refresh
+        if: github.event.action == 'labeled' && github.event.label.name == 'outside-approved-scope'
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Handle outside-approved-scope label
         if: github.event.action == 'labeled' && github.event.label.name == 'outside-approved-scope'
         shell: bash
@@ -85,6 +104,15 @@ jobs:
           retry gh pr comment "$NUMBER" -R "$GH_REPO" -b "$BODY" || true
           retry gh pr close "$NUMBER" -R "$GH_REPO" || true
 
+      - name: Live Activity · refresh
+        if: github.event.action == 'unlabeled' && (github.event.label.name == 'does-not-meet-guidelines' || github.event.label.name == 'outside-approved-scope')
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Reopen PR when label removed
         if: github.event.action == 'unlabeled' && (github.event.label.name == 'does-not-meet-guidelines' || github.event.label.name == 'outside-approved-scope')
         shell: bash
@@ -92,6 +120,15 @@ jobs:
           retry() { n=0; until "$@"; do n=$((n+1)); [ $n -ge 3 ] && break; sleep 2; done; }
           retry gh pr reopen "$NUMBER" -R "$GH_REPO" || true
 
+      - name: Live Activity · refresh
+        if: github.event.action == 'reopened'
+        uses: davidpovarsky/github-automation/live-refresh@main
+        continue-on-error: true
+        with:
+          event: refresh
+          device_id: ${{ secrets.NOTIFY_DEVICE_ID }}
+          token: ${{ secrets.NOTIFY_DEVICE_TOKEN }}
+          github_token: ${{ github.token }}
       - name: Cleanup labels on manual reopen
         if: github.event.action == 'reopened'
         shell: bash
